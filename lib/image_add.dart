@@ -74,11 +74,10 @@ class _ImageAddState extends State<ImageAdd> {
           itemBuilder: (context,int index){
         return MaterialButton(
           padding: EdgeInsets.all(0),
-          height: 255,
           onPressed: (){
             _cropImage(index);
           },
-          child: Image.file(images[index],width: 250,height: 250,),
+          child: Image.file(images[index],width: 200,height: 200,),
         );
       }),
       persistentFooterButtons: [

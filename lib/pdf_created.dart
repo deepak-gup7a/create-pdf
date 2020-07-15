@@ -1,59 +1,1 @@
-import 'package:flutter/material.dart';
-import 'dart:io';
-import 'package:pdf/pdf.dart';
-import 'package:pdf/widgets.dart' as pw;
-import 'package:path_provider/path_provider.dart';
-
-class CreatePdf extends StatefulWidget {
-  List<File>images;
-  CreatePdf(this.images);
-  @override
-  _CreatePdfState createState() => _CreatePdfState();
-}
-
-class _CreatePdfState extends State<CreatePdf> {
-  final pdf = pw.Document();
-  _showPdf(List<File> images)
-  {
-      for(int i=0;i<images.length;i++)
-        {
-          final image = PdfImage.file(pdf.document,bytes: File(images[i].path).readAsBytesSync());
-            pdf.addPage(
-              pw.Page(
-                build: (pw.Context context){
-                  return pw.Center(
-                    child: pw.Image(image),
-                  );
-                }
-              )
-            );
-        }
-      //savePdf();
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _showPdf(widget.images);
-  }
-
-  Future savePdf()async{
-    var dir = await getExternalStorageDirectory();
-    var path = dir.path+'/example.pdf';
-    print(dir);
-    final file = File(path);
-    await file.writeAsBytes(pdf.save());
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: pdf==null?Text("Loading.."):MaterialButton(
-          child: Text("done"),
-          onPressed:()=> savePdf(),
-        ),
-      ),
-    );
-  }
-}
+import 'package:flutter/material.dart';import 'package:open_file/open_file.dart';import 'dart:io';import 'package:pdf/pdf.dart';import 'package:pdf/widgets.dart' as pw;import 'package:path_provider/path_provider.dart';class CreatePdf extends StatefulWidget {  List<File>images;  CreatePdf(this.images);  @override  _CreatePdfState createState() => _CreatePdfState();}class _CreatePdfState extends State<CreatePdf> {  final pdf = pw.Document();  _showPdf(List<File> images)  {      for(int i=0;i<images.length;i++)        {          final image = PdfImage.file(pdf.document,bytes: File(images[i].path).readAsBytesSync());            pdf.addPage(              pw.Page(                pageFormat: PdfPageFormat.undefined,                build: (pw.Context context){                  return pw.Center(                    child: pw.Image(image),                  );                }              )            );        }      //savePdf();  }  @override  void initState() {    super.initState();    _showPdf(widget.images);  }  var path;  var pdfName = '${DateTime.now()}.pdf';  Future savePdf()async{    var dir = await getExternalStorageDirectory();    path = dir.path+pdfName;    print(path);    final file = File(path);    await file.writeAsBytes(pdf.save());  }  _openPdf ()async  {       OpenFile.open(path);  }  TextEditingController _controller;  _showDialog()async{      await showDialog(context: context,builder: (_){        return AlertDialog(          title: Text("Rename"),          scrollable: true,          content: SingleChildScrollView(            child: TextField(               controller: _controller,              decoration: InputDecoration(                hintText: "Add new name"              ),            ),          ),          actions: [            MaterialButton(              child: Text("Rename"),              onPressed:(){                if(_controller.text != null)                  {                      if(_controller.text.split('.').last.toLowerCase() == 'pdf')                        {                            setState(() {                              pdfName = _controller.text;                            });                        }                      else                        {                            setState(() {                              pdfName = _controller.text+'.pdf';                            });                        }                  }                Navigator.of(context).pop();              },            )          ],        );      });  }  @override  Widget build(BuildContext context) {    return Scaffold(      appBar: AppBar(        title: MaterialButton(          child: Text(pdfName),          onPressed: _showDialog,        ),      ),      body: Center(        child: MaterialButton(          child: Text("save pdf"),          color: Colors.white54,          onPressed: savePdf,        ),      ),    );  }}

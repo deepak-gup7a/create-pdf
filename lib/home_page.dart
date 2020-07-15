@@ -17,11 +17,6 @@ class HomePage extends StatelessWidget {
                   return ImageAdd();
                 }));
               },
-            ),
-            RaisedButton(
-              color: Colors.white70,
-              child: Text("update"),
-              onPressed: (){},
             )
           ],
         ),
